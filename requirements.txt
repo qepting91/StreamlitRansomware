@@ -1,4 +1,3 @@
 Pillow
 Plotly
 markdownlit
-plotly.graph_objects
