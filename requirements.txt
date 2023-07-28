@@ -1,5 +1,5 @@
-git+https://github.com/streamlit/gsheets-connection
-PIL
+gsheets-connection @ git+https://github.com/streamlit/gsheets-connection.git
+Pillow
 Plotly
 markdownlit
-Plotly.graph_objects
+plotly.graph_objects
