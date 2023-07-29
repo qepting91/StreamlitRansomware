@@ -20,61 +20,22 @@ def display_options(data):
         st.write(data.iloc[:, :3]) 
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
-        st.subheader('Attacks Over Time')
+    st.subheader('Attacks Over Time')
 
-        all_groups = data['Group'].unique().tolist()
-        selected_groups = st.multiselect('Select Groups', all_groups, default=[])
-        filtered_data = data[data['Group'].isin(selected_groups)]
+    all_groups = data['Group'].unique().tolist()
+    selected_groups = st.multiselect('Select Groups', all_groups, default=[])
+    filtered_data = data[data['Group'].isin(selected_groups)]
 
-        if not selected_groups:
-            st.write("Select at least one group to display the graph")
-        else:
-            # Set 'Date' as index and resample the data monthly
-            filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
-            
-            # Initialize an empty figure
-            fig = go.Figure()
+    if not selected_groups:
+        st.write("Select at least one group to display the graph")
+    else:
+        # Convert 'Date' column back to datetime type for resampling
+        filtered_data['Date'] = pd.to_datetime(filtered_data['Date'], format='%b %Y')
 
-            # Loop over the groups to add a line for each group
-            for group in selected_groups:
-                group_data = filtered_data[filtered_data['Group'] == group]
-                # Continue if group_data is not empty
-                if not group_data.empty:
-                    fig.add_trace(go.Scatter(
-                        x=group_data['Date'], 
-                        y=group_data['Number of Attacks'], 
-                        mode='lines+markers+text', 
-                        name=group, 
-                        text=group_data['Number of Attacks'], 
-                        textposition='top center',
-                        line=dict(color='#f8931d'),  # set the color of the line
-                        marker=dict(
-                            symbol='star',
-                            color='black',  # set the color of the marker
-                            size=10  # adjust the size of the marker
-                        )
+        # Set 'Date' as index and resample the data monthly
+        filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
+        filtered_data['Date'] = filtered_data['Date'].dt.strftime('%b %Y')
 
-                    ))
-            
-            fig.update_layout(
-                title='Attacks Over Time by Group',
-                title_x=0.5, 
-                xaxis_title='Date', 
-                yaxis_title='Number of Attacks',
-                hovermode='x unified',
-                plot_bgcolor='#f8fafc',
-                paper_bgcolor='#f8fafc',
-                font=dict(color='#222222')
-            )
-
-            # Display the figure
-            st.plotly_chart(fig, use_container_width=True)
-            if st.checkbox('Show description for "Attacks Over Time"'):
-                st.markdown("""
-                    The chart above depicts the number of ransomware attacks over time for the selected groups. 
-                    The x-axis represents time (in months and years), while the y-axis represents the count of attacks. Each line corresponds to a different group.
-                    The markers show the number of attacks for each month. The plot allows us to analyze the frequency and trend of attacks over time for each group.
-                """)
 
     if st.sidebar.checkbox('Show repeated targets by group and date'):
         st.subheader('Repeated Targets by Group and Date')
