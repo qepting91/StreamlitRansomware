@@ -100,7 +100,7 @@ def display_options(data):
                 target_data = selected_data[selected_data['Title'] == target]
                 for date in target_data['Dates'].values[0]:
                     fig.add_trace(go.Scatter(
-                        x=[date.strftime('%b %Y') for date in target_data['Dates'].values[0]], 
+                        x=[date.strftime('%b %Y') for date in target_data['Dates'].tolist()[0]],  
                         y=target_data['Title'], 
                         mode='markers', 
                         name=target,
