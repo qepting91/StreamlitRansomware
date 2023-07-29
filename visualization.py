@@ -29,23 +29,15 @@ def display_options(data):
         if not selected_groups:
             st.write("Select at least one group to display the graph")
         else:
-            # Ensure 'Date' column is in datetime format
-            filtered_data['Date'] = pd.to_datetime(filtered_data['Date'])
-            # Print filtered_data to check its content
-            st.write(filtered_data)
             # Set 'Date' as index and resample the data monthly
             filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
             filtered_data['Date'] = filtered_data['Date'].dt.strftime('%b %Y')
-            # Print filtered_data after resampling to check its content
-            st.write(filtered_data)
             # Initialize an empty figure
             fig = go.Figure()
 
             # Loop over the groups to add a line for each group
             for group in selected_groups:
                 group_data = filtered_data[filtered_data['Group'] == group]
-                # Print group_data to check its content
-                st.write(group_data)
                 # Continue if group_data is not empty
                 if not group_data.empty:
                     fig.add_trace(go.Scatter(
@@ -100,7 +92,7 @@ def display_options(data):
             st.write("Select at least one target to display the graph")
         else:
             # Ensure 'Date' column is in datetime format
-            selected_data['Dates'] = selected_data['Dates'].apply(lambda x: pd.to_datetime(x))
+            selected_data['Dates'] = selected_data['Dates'].apply(lambda x: pd.to_datetime(x, format='%b %d, %Y'))
             
             # Initialize an empty figure
             fig = go.Figure()
@@ -108,13 +100,10 @@ def display_options(data):
                 target_data = selected_data[selected_data['Title'] == target]
                 for date in target_data['Dates'].values[0]:
                     fig.add_trace(go.Scatter(
-                        x=group_data['Date'], 
-                        y=group_data['Number of Attacks'], 
-                        mode='lines+markers+text', 
-                        name=group, 
-                        text=group_data['Number of Attacks'], 
-                        textposition='top center',
-                        line=dict(color='#f8931d'),  # set the color of the line
+                        x=[date.strftime('%b %Y') for date in target_data['Dates'].values[0]], 
+                        y=target_data['Title'], 
+                        mode='markers', 
+                        name=target,
                         marker=dict(
                             symbol='star',
                             color='black',  # set the color of the marker
@@ -127,6 +116,7 @@ def display_options(data):
                 title=f"{selected_group} attacking selected targets",
                 title_x=0.5,
                 xaxis_title='Date',
+                yaxis_title='Target',
                 hovermode='x unified',
                 plot_bgcolor='#f8fafc',
                 paper_bgcolor='#f8fafc',
