@@ -17,7 +17,6 @@ def load_data():
 @st.cache_data(ttl=600)
 def load_rss_data():
     url = convert_sheets_to_csv_url("https://docs.google.com/spreadsheets/d/1GxUiFb00sCTytJ4XkegN8qnZ4WAmsXWGVV98eMN8F_I/edit#gid=1687625614")
-    rss_data = pd.read_csv(url, parse_dates=['Date'], date_parser=lambda x: pd.to_datetime(x, format='%b %d, %Y'))
-    data['Date'] = data['Date'].dt.strftime('%b %Y')
+    rss_data = pd.read_csv(url, usecols=[0, 1, 2])
     return rss_data.copy()
 
