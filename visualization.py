@@ -31,7 +31,7 @@ def display_options(data):
         else:
             # Set 'Date' as index and resample the data monthly
             filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
-            filtered_data['Date'] = filtered_data['Date'].dt.strftime('%b %Y')
+            
             # Initialize an empty figure
             fig = go.Figure()
 
@@ -91,16 +91,13 @@ def display_options(data):
         if not selected_target:
             st.write("Select at least one target to display the graph")
         else:
-            # Ensure 'Date' column is in datetime format
-            selected_data['Dates'] = selected_data['Dates'].apply(lambda x: pd.to_datetime(x, format='%b %d, %Y'))
-            
             # Initialize an empty figure
             fig = go.Figure()
             for target in selected_target:
                 target_data = selected_data[selected_data['Title'] == target]
-                for date in target_data['Dates'].values[0]:
+                for date in target_data['Dates'].tolist()[0]:
                     fig.add_trace(go.Scatter(
-                        x=[date.strftime('%b %Y') for date in target_data['Dates'].tolist()[0]],  
+                        x=[date for date in target_data['Dates'].tolist()[0]], 
                         y=target_data['Title'], 
                         mode='markers', 
                         name=target,
