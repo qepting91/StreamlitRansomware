@@ -31,32 +31,38 @@ def display_options(data):
         else:
             # Ensure 'Date' column is in datetime format
             filtered_data['Date'] = pd.to_datetime(filtered_data['Date'])
-
+            # Print filtered_data to check its content
+            st.write(filtered_data)
             # Set 'Date' as index and resample the data monthly
             filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
             filtered_data['Date'] = filtered_data['Date'].dt.strftime('%b %Y')
-
+            # Print filtered_data after resampling to check its content
+            st.write(filtered_data)
             # Initialize an empty figure
             fig = go.Figure()
 
             # Loop over the groups to add a line for each group
             for group in selected_groups:
                 group_data = filtered_data[filtered_data['Group'] == group]
-                fig.add_trace(go.Scatter(
-                    x=group_data['Date'], 
-                    y=group_data['Number of Attacks'], 
-                    mode='lines+markers+text', 
-                    name=group, 
-                    text=group_data['Number of Attacks'], 
-                    textposition='top center',
-                    line=dict(color='#f8931d'),  # set the color of the line
-                    marker=dict(
-                        symbol='star',
-                        color='black',  # set the color of the marker
-                        size=10  # adjust the size of the marker
-                    )
+                # Print group_data to check its content
+                st.write(group_data)
+                # Continue if group_data is not empty
+                if not group_data.empty:
+                    fig.add_trace(go.Scatter(
+                        x=group_data['Date'], 
+                        y=group_data['Number of Attacks'], 
+                        mode='lines+markers+text', 
+                        name=group, 
+                        text=group_data['Number of Attacks'], 
+                        textposition='top center',
+                        line=dict(color='#f8931d'),  # set the color of the line
+                        marker=dict(
+                            symbol='star',
+                            color='black',  # set the color of the marker
+                            size=10  # adjust the size of the marker
+                        )
 
-                ))
+                    ))
             
             fig.update_layout(
                 title='Attacks Over Time by Group',
@@ -135,8 +141,6 @@ def display_options(data):
                     Each marker on the plot represents an attack. The x-axis represents time (dates of attacks) and the y-axis represents the targets. 
                     This visualization helps us understand which targets are repeatedly attacked by a particular group.
                 """)
-
-
 
     if st.sidebar.checkbox('Download CSV file'):
         csv = data.to_csv(index=False)
