@@ -18,7 +18,7 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Data Starting with Most Recent Attacks')
-        st.write(data.iloc[:, :3]) 
+        st.write(data.iloc[:, 1:4]) 
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
         st.subheader('Attacks Over Time')
