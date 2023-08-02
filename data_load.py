@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Table, MetaData, select
 import pandas as pd
 import streamlit as st
+from datetime import datetime
 
 # Create the SQLAlchemy engine
 database_url = st.secrets["database"]["url"]
@@ -16,7 +17,7 @@ def convert_sheets_to_csv_url(sheets_url):
 
 # Read in data from CockroachDB.
 # Uses st.cache to only rerun when the query changes or after 10 min.
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=600, allow_output_mutation=True)
 def load_data():
     # Query the table
     stmt = select(ransomware_fulldata)
@@ -25,7 +26,7 @@ def load_data():
         data = pd.DataFrame(result.fetchall(), columns=result.keys())
 
     # Convert the 'date' column to datetime format and reformat it to '%b %Y'
-    data['date'] = pd.to_datetime(data['date']).dt.strftime('%b %Y')
+    data['date'] = data['date'].apply(lambda x: datetime.strftime(x, '%b %Y'))
 
     return data.copy()
 
