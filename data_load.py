@@ -1,15 +1,10 @@
-from sqlalchemy import create_engine, Table, MetaData, select
+import psycopg2
 import pandas as pd
 import streamlit as st
 from datetime import datetime
 
-# Create the SQLAlchemy engine
+# Get the database URL from secrets
 database_url = st.secrets["database"]["url"]
-engine = create_engine(database_url)
-
-# Reflect the ransomware_fulldata table
-metadata = MetaData()
-ransomware_fulldata = Table('ransomware_fulldata', metadata, autoload_with=engine)
 
 # Function to convert Google Sheets URL to CSV URL
 def convert_sheets_to_csv_url(sheets_url):
@@ -19,14 +14,26 @@ def convert_sheets_to_csv_url(sheets_url):
 # Uses st.cache_data to only rerun when the query changes or after 10 min.
 @st.cache_data(ttl=600)
 def load_data():
+    # Connect to the database
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+
     # Query the table
-    stmt = select(ransomware_fulldata)
-    with engine.connect() as connection:
-        result = connection.execute(stmt)
-        data = pd.DataFrame(result.fetchall(), columns=result.keys())
+    cur.execute("SELECT * FROM ransomware_fulldata")
+    result = cur.fetchall()
+
+    # Fetch column names from cursor description
+    col_names = [desc[0] for desc in cur.description]
+
+    # Create a DataFrame from the result
+    data = pd.DataFrame(result, columns=col_names)
 
     # Convert the 'date' column to datetime format and reformat it to '%b %Y'
     data['date'] = pd.to_datetime(data['date']).dt.strftime('%b %Y')
+
+    # Close the cursor and connection
+    cur.close()
+    conn.close()
 
     return data.copy()
 
