@@ -19,7 +19,7 @@ def load_data():
     cur = conn.cursor()
 
     # Query the table
-    cur.execute("SELECT * FROM ransomware_fulldata")
+    cur.execute("SELECT * FROM ransomware")
     result = cur.fetchall()
 
     # Fetch column names from cursor description
