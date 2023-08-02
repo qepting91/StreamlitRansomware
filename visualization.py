@@ -14,7 +14,7 @@ def display_options(data):
 
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
-        st.subheader('Data Starting with Most Recent Attacks')
+        st.subheader('Data Starting with Most Recent Attacks Filter on Entry Number at the Left of the Table')
         st.write(data[['group', 'title', 'date']].sort_values(by='date', ascending=False))
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
@@ -28,18 +28,18 @@ def display_options(data):
             st.write("Select at least one group to display the graph")
         else:
             # Convert 'date' column back to datetime type for resampling
-            filtered_data['date'] = pd.to_datetime(filtered_data['date'], format='%b %d, %Y')
-
+            filtered_data['date'] = pd.to_datetime(filtered_data['date'])
+        
             # Set 'date' as index and resample the data monthly
             filtered_data = filtered_data.set_index('date').groupby('group').resample('M').size().reset_index(name='Number of Attacks')
             filtered_data['date'] = filtered_data['date'].dt.strftime('%b %d, %Y')
-
+        
             # Initialize an empty figure
             fig = go.Figure()
-
+        
             # Define colors for the groups
             colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-
+        
             # Loop over the groups to add a line for each group
             for i, group in enumerate(selected_groups):
                 group_data = filtered_data[filtered_data['group'] == group]
@@ -48,7 +48,7 @@ def display_options(data):
                     y=group_data['Number of Attacks'], 
                     mode='lines+markers+text', 
                     name=group, 
-                    text=group_data['date'].dt.day, 
+                    text=group_data['date'].dt.day,  # Day of the month
                     textposition='top center',
                     line=dict(color=colors[i % len(colors)]),  # set the color of the line
                     marker=dict(
