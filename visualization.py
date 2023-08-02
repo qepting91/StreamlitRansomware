@@ -1,12 +1,9 @@
 import streamlit as st
 import pandas as pd
 import base64
-from data_process import process_data
 import plotly.graph_objects as go
-import itertools
 
 def display_options(data):
-    data = process_data(data)
     pd.set_option('display.max_colwidth', None)
 
     st.sidebar.markdown('<p class="font">Ransomware Data Database</p>', unsafe_allow_html=True)
@@ -39,10 +36,12 @@ def display_options(data):
 
             # Initialize an empty figure
             fig = go.Figure()
-            # Define a color palette
-            color_palette = ['#f8931d','#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+
+            # Define colors for the groups
+            colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+
             # Loop over the groups to add a line for each group
-            for group in selected_groups:
+            for i, group in enumerate(selected_groups):
                 group_data = filtered_data[filtered_data['group'] == group]
                 fig.add_trace(go.Scatter(
                     x=group_data['date'], 
@@ -51,13 +50,12 @@ def display_options(data):
                     name=group, 
                     text=group_data['Number of Attacks'], 
                     textposition='top center',
-                    line=dict(color=next(color_cycle)),  # set the color of the line
+                    line=dict(color=colors[i % len(colors)]),  # set the color of the line
                     marker=dict(
                         symbol='star',
                         color='black',  # set the color of the marker
                         size=10  # adjust the size of the marker
                     )
-
                 ))
             
             fig.update_layout(
