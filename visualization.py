@@ -17,6 +17,12 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Filter on Entry Number at the Left of the Table for Most Recent Attack')
+        all_groups = data['group'].unique().tolist()
+        selected_group = st.selectbox('Select a Group', ['All Groups'] + all_groups)
+
+        if selected_group != 'All Groups':
+            data = data[data['group'] == selected_group]
+
         st.write(data[['group', 'title', 'date']].sort_values(by='date', ascending=False))
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
