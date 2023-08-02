@@ -17,7 +17,7 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Data Starting with Most Recent Attacks')
-        st.write(data.iloc[:, 1:4])  # Skip the first (0th) column 
+        st.write(data.iloc[:, :3]) 
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
         st.subheader('Attacks Over Time')
@@ -30,7 +30,7 @@ def display_options(data):
             st.write("Select at least one group to display the graph")
         else:
             # Convert 'date' column back to datetime type for resampling
-            filtered_data['date'] = pd.to_datetime(filtered_data['date'], format='%b %Y')
+            filtered_data['date'] = pd.to_datetime(filtered_data['date'], format='%b %d, %Y')
 
             # Set 'date' as index and resample the data monthly
             filtered_data = filtered_data.set_index('date').groupby('group').resample('M').size().reset_index(name='Number of Attacks')
@@ -55,7 +55,6 @@ def display_options(data):
                         color='black',  # set the color of the marker
                         size=10  # adjust the size of the marker
                     )
-
                 ))
             
             fig.update_layout(
@@ -76,59 +75,6 @@ def display_options(data):
                     The chart above depicts the number of ransomware attacks over time for the selected groups. 
                     The x-axis represents time (in months and years), while the y-axis represents the count of attacks. Each line corresponds to a different group.
                     The markers show the number of attacks for each month. The plot allows us to analyze the frequency and trend of attacks over time for each group.
-                """)
-
-    if st.sidebar.checkbox('Show repeated targets by group and date'):
-        st.subheader('Repeated Targets by Group and Date')
-        group_target_dates = data.groupby(['group', 'title'])['date'].apply(list).reset_index(name='Dates')
-        group_target_dates = group_target_dates[group_target_dates['Dates'].str.len() > 1]
-        st.write(group_target_dates)
-        groups = group_target_dates['group'].unique().tolist()
-        selected_group = st.selectbox('Select a Group', groups)
-        targets = group_target_dates[group_target_dates['group'] == selected_group]['title'].unique().tolist()
-        selected_target = st.multiselect('Select a Target', targets)  # Using multiselect for targets
-        selected_data = group_target_dates[(group_target_dates['group'] == selected_group) &
-                                            (group_target_dates['title'].isin(selected_target))]
-
-        if not selected_target:
-            st.write("Select at least one target to display the graph")
-        else:
-            # Initialize an empty figure
-            fig = go.Figure()
-            for target in selected_target:
-                target_data = selected_data[selected_data['title'] == target]
-                for date in target_data['Dates'].tolist()[0]:
-                    fig.add_trace(go.Scatter(
-                        x=[date for date in target_data['Dates'].tolist()[0]], 
-                        y=target_data['title'], 
-                        mode='markers', 
-                        name=target,
-                        marker=dict(
-                            symbol='star',
-                            color='black',  # set the color of the marker
-                            size=10  # adjust the size of the marker
-                        )
-                    ))
-
-            # Update layout
-            fig.update_layout(
-                title=f"{selected_group} attacking selected targets",
-                title_x=0.5,
-                xaxis_title='Date',
-                yaxis_title='Target',
-                hovermode='x unified',
-                plot_bgcolor='#f8fafc',
-                paper_bgcolor='#f8fafc',
-                font=dict(color='#222222')
-            )
-
-            # Display the figure
-            st.plotly_chart(fig, use_container_width=True)
-            if st.checkbox('Show description for "Repeated Targets by Group and Date"'):
-                st.markdown("""
-                    This scatter plot represents the repeated attacks on selected targets by the selected group. 
-                    Each marker on the plot represents an attack. The x-axis represents time (dates of attacks) and the y-axis represents the targets. 
-                    This visualization helps us understand which targets are repeatedly attacked by a particular group.
                 """)
 
     if st.sidebar.checkbox('Download CSV file'):
