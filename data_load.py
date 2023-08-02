@@ -1,7 +1,6 @@
 import psycopg2
 import pandas as pd
 import streamlit as st
-from datetime import datetime
 
 # Get the database URL from secrets
 database_url = st.secrets["database"]["url"]
@@ -28,15 +27,14 @@ def load_data():
     # Create a DataFrame from the result
     data = pd.DataFrame(result, columns=col_names)
 
-    # Convert the 'date' column to datetime format and reformat it to '%b %Y'
-    data['date'] = pd.to_datetime(data['date']).dt.strftime('%b %Y')
+    # Convert the 'date' column to datetime format and reformat it to '%b %d, %Y'
+    data['date'] = pd.to_datetime(data['date']).dt.strftime('%b %d, %Y')
 
     # Close the cursor and connection
     cur.close()
     conn.close()
 
     return data.copy()
-
 @st.cache_data(ttl=600)
 def load_rss_data():
     url = convert_sheets_to_csv_url("https://docs.google.com/spreadsheets/d/1GxUiFb00sCTytJ4XkegN8qnZ4WAmsXWGVV98eMN8F_I/edit#gid=1687625614")
