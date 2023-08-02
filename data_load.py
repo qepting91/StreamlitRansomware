@@ -1,6 +1,14 @@
+from sqlalchemy import create_engine, Table, MetaData, select
 import pandas as pd
 import streamlit as st
-from sqlalchemy import create_engine, Table, MetaData, select
+
+# Create the SQLAlchemy engine
+database_url = st.secrets["database"]["url"]
+engine = create_engine(database_url)
+
+# Reflect the ransomware_fulldata table
+metadata = MetaData()
+ransomware_fulldata = Table('ransomware_fulldata', metadata, autoload_with=engine)
 
 # Function to convert Google Sheets URL to CSV URL
 def convert_sheets_to_csv_url(sheets_url):
@@ -10,14 +18,6 @@ def convert_sheets_to_csv_url(sheets_url):
 # Uses st.cache to only rerun when the query changes or after 10 min.
 @st.cache(ttl=600)
 def load_data():
-    # Setup the database connection
-    database_url = st.secrets["database"]["url"]
-    engine = create_engine(database_url)
-
-    # Reflect the ransomware_fulldata table
-    metadata = MetaData()
-    ransomware_fulldata = Table('ransomware_fulldata', metadata, autoload_with=engine)
-
     # Query the table
     stmt = select(ransomware_fulldata)
     with engine.connect() as connection:
@@ -29,10 +29,8 @@ def load_data():
 
     return data.copy()
 
-
-@st.cache_data(ttl=600)
+@st.cache(ttl=600)
 def load_rss_data():
     url = convert_sheets_to_csv_url("https://docs.google.com/spreadsheets/d/1GxUiFb00sCTytJ4XkegN8qnZ4WAmsXWGVV98eMN8F_I/edit#gid=1687625614")
     rss_data = pd.read_csv(url, usecols=[0, 1, 2])
     return rss_data.copy()
-
