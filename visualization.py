@@ -48,7 +48,7 @@ def display_options(data):
                     y=group_data['Number of Attacks'], 
                     mode='lines+markers+text', 
                     name=group, 
-                    text=group_data['Number of Attacks'], 
+                    text=group_data['date'].dt.day, 
                     textposition='top center',
                     line=dict(color=colors[i % len(colors)]),  # set the color of the line
                     marker=dict(
