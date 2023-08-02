@@ -5,3 +5,4 @@ sqlalchemy
 python-dotenv
 sqlalchemy-cockroachdb
 psycopg2-binary
+psycopg2
