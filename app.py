@@ -14,7 +14,7 @@ PAGES = {
 }
 
 def main():
-    data = pd.DataFrame(result, columns=['id', 'group', 'title', 'date'])
+    data = pd.DataFrame(data, columns=['id', 'group', 'title', 'date'])
 
     st.sidebar.title('Navigation')
     selection = st.sidebar.radio("Go to", list(PAGES.keys()))
