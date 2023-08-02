@@ -8,6 +8,9 @@ def display_options(data):
     data = process_data(data)
     pd.set_option('display.max_colwidth', None)
 
+    # Skip the first column (id)
+    data = data.iloc[:, 1:]
+
     st.sidebar.markdown('<p class="font">Ransomware Data Database</p>', unsafe_allow_html=True)
     st.sidebar.subheader("About the App")
     st.sidebar.text("""
