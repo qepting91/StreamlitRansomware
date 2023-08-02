@@ -4,6 +4,7 @@ from visualization import display_options
 from about import about_section
 from wiki import wiki_section
 from rss_reader import rss_reader
+import pandas as pd
 
 PAGES = {
     "About": about_section,
