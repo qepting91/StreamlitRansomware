@@ -1,3 +1,5 @@
 Pillow
 Plotly
 markdownlit
+sqlalchemy
+python-dotenv
