@@ -3,6 +3,7 @@ import pandas as pd
 import base64
 from data_process import process_data
 import plotly.graph_objects as go
+import itertools
 
 def display_options(data):
     data = process_data(data)
@@ -17,7 +18,7 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Data Starting with Most Recent Attacks')
-        st.write(data.sort_values(by='date', ascending=False)) 
+        st.write(data[['group', 'title', 'date']].sort_values(by='date', ascending=False))
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
         st.subheader('Attacks Over Time')
@@ -38,7 +39,8 @@ def display_options(data):
 
             # Initialize an empty figure
             fig = go.Figure()
-
+            # Define a color palette
+            color_palette = ['#f8931d','#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
             # Loop over the groups to add a line for each group
             for group in selected_groups:
                 group_data = filtered_data[filtered_data['group'] == group]
@@ -49,7 +51,7 @@ def display_options(data):
                     name=group, 
                     text=group_data['Number of Attacks'], 
                     textposition='top center',
-                    line=dict(color='#f8931d'),  # set the color of the line
+                    line=dict(color=next(color_cycle)),  # set the color of the line
                     marker=dict(
                         symbol='star',
                         color='black',  # set the color of the marker
