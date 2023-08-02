@@ -8,7 +8,6 @@ def display_options(data):
     data = process_data(data)
     pd.set_option('display.max_colwidth', None)
 
-
     st.sidebar.markdown('<p class="font">Ransomware Data Database</p>', unsafe_allow_html=True)
     st.sidebar.subheader("About the App")
     st.sidebar.text("""
@@ -18,33 +17,33 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Data Starting with Most Recent Attacks')
-        st.write(data.iloc[:, 1:4]) 
+        st.write(data.iloc[:, 1:4])  # Skip the first (0th) column 
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
         st.subheader('Attacks Over Time')
 
-        all_groups = data['Group'].unique().tolist()
+        all_groups = data['group'].unique().tolist()
         selected_groups = st.multiselect('Select Groups', all_groups, default=[])
-        filtered_data = data[data['Group'].isin(selected_groups)].copy()
+        filtered_data = data[data['group'].isin(selected_groups)].copy()
 
         if not selected_groups:
             st.write("Select at least one group to display the graph")
         else:
-            # Convert 'Date' column back to datetime type for resampling
-            filtered_data['Date'] = pd.to_datetime(filtered_data['Date'], format='%b %Y')
+            # Convert 'date' column back to datetime type for resampling
+            filtered_data['date'] = pd.to_datetime(filtered_data['date'], format='%b %Y')
 
-            # Set 'Date' as index and resample the data monthly
-            filtered_data = filtered_data.set_index('Date').groupby('Group').resample('M').size().reset_index(name='Number of Attacks')
-            filtered_data['Date'] = filtered_data['Date'].dt.strftime('%b %Y')
+            # Set 'date' as index and resample the data monthly
+            filtered_data = filtered_data.set_index('date').groupby('group').resample('M').size().reset_index(name='Number of Attacks')
+            filtered_data['date'] = filtered_data['date'].dt.strftime('%b %Y')
 
             # Initialize an empty figure
             fig = go.Figure()
 
             # Loop over the groups to add a line for each group
             for group in selected_groups:
-                group_data = filtered_data[filtered_data['Group'] == group]
+                group_data = filtered_data[filtered_data['group'] == group]
                 fig.add_trace(go.Scatter(
-                    x=group_data['Date'], 
+                    x=group_data['date'], 
                     y=group_data['Number of Attacks'], 
                     mode='lines+markers+text', 
                     name=group, 
@@ -81,15 +80,15 @@ def display_options(data):
 
     if st.sidebar.checkbox('Show repeated targets by group and date'):
         st.subheader('Repeated Targets by Group and Date')
-        group_target_dates = data.groupby(['Group', 'Title'])['Date'].apply(list).reset_index(name='Dates')
+        group_target_dates = data.groupby(['group', 'title'])['date'].apply(list).reset_index(name='Dates')
         group_target_dates = group_target_dates[group_target_dates['Dates'].str.len() > 1]
         st.write(group_target_dates)
-        groups = group_target_dates['Group'].unique().tolist()
+        groups = group_target_dates['group'].unique().tolist()
         selected_group = st.selectbox('Select a Group', groups)
-        targets = group_target_dates[group_target_dates['Group'] == selected_group]['Title'].unique().tolist()
+        targets = group_target_dates[group_target_dates['group'] == selected_group]['title'].unique().tolist()
         selected_target = st.multiselect('Select a Target', targets)  # Using multiselect for targets
-        selected_data = group_target_dates[(group_target_dates['Group'] == selected_group) &
-                                            (group_target_dates['Title'].isin(selected_target))]
+        selected_data = group_target_dates[(group_target_dates['group'] == selected_group) &
+                                            (group_target_dates['title'].isin(selected_target))]
 
         if not selected_target:
             st.write("Select at least one target to display the graph")
