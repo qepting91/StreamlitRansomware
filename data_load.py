@@ -17,7 +17,7 @@ def load_data():
     conn = psycopg2.connect(database_url)
     cur = conn.cursor()
 
-    # Query the table
+    # Query the new table
     cur.execute("SELECT * FROM ransomware")
     result = cur.fetchall()
 
@@ -29,6 +29,9 @@ def load_data():
 
     # Convert the 'date' column to datetime format and reformat it to '%b %d, %Y'
     data['date'] = pd.to_datetime(data['date']).dt.strftime('%b %d, %Y')
+
+    # Sort by date (most recent at the top)
+    data.sort_values(by='date', ascending=False, inplace=True)
 
     # Close the cursor and connection
     cur.close()
