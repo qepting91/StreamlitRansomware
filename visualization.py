@@ -96,11 +96,11 @@ def display_options(data):
             # Initialize an empty figure
             fig = go.Figure()
             for target in selected_target:
-                target_data = selected_data[selected_data['Title'] == target]
+                target_data = selected_data[selected_data['title'] == target]
                 for date in target_data['Dates'].tolist()[0]:
                     fig.add_trace(go.Scatter(
                         x=[date for date in target_data['Dates'].tolist()[0]], 
-                        y=target_data['Title'], 
+                        y=target_data['title'], 
                         mode='markers', 
                         name=target,
                         marker=dict(
