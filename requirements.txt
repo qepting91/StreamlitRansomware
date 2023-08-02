@@ -3,3 +3,4 @@ Plotly
 markdownlit
 sqlalchemy
 python-dotenv
+sqlalchemy-cockroachdb
