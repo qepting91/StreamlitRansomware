@@ -8,8 +8,6 @@ def display_options(data):
     data = process_data(data)
     pd.set_option('display.max_colwidth', None)
 
-    # Skip the first column (id)
-    data = data.iloc[:, 1:]
 
     st.sidebar.markdown('<p class="font">Ransomware Data Database</p>', unsafe_allow_html=True)
     st.sidebar.subheader("About the App")
@@ -20,7 +18,7 @@ def display_options(data):
     st.sidebar.subheader('Statistics')
     if st.sidebar.checkbox('Full Data Set', key='full_data_set'):
         st.subheader('Data Starting with Most Recent Attacks')
-        st.write(data.iloc[:, 1:4]) 
+        st.write(data.iloc[:, :3]) 
 
     if st.sidebar.checkbox('Show attacks over time', help='Toggle to view the number of attacks over time'):
         st.subheader('Attacks Over Time')
